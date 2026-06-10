@@ -97,7 +97,8 @@ function Dashboard() {
   const [selected, setSelected]         = useState<Word | null>(null);
 
   const [editingWord, setEditingWord]   = useState<Word | null>(null);
-  const [sortDir, setSortDir]           = useState<'asc' | 'desc' | null>(null);
+  const [sortField, setSortField]        = useState<'word' | 'type' | null>(null);
+  const [sortDir, setSortDir]           = useState<'asc' | 'desc'>('asc');
 
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [addWordOpen, setAddWordOpen]   = useState(false);
@@ -341,12 +342,24 @@ function Dashboard() {
   }, [words, query, statusFilter, langFilter, deckFilter]);
 
   const sorted = useMemo(() => {
-    if (!sortDir) return filtered;
+    if (!sortField) return filtered;
     return [...filtered].sort((a, b) => {
-      const cmp = a.word.localeCompare(b.word);
+      const cmp = sortField === 'type'
+        ? (a.partOfSpeech ?? '').localeCompare(b.partOfSpeech ?? '')
+        : a.word.localeCompare(b.word);
       return sortDir === 'asc' ? cmp : -cmp;
     });
-  }, [filtered, sortDir]);
+  }, [filtered, sortField, sortDir]);
+
+  const handleSort = (field: 'word' | 'type') => {
+    if (sortField === field) {
+      if (sortDir === 'asc') setSortDir('desc');
+      else { setSortField(null); setSortDir('asc'); }
+    } else {
+      setSortField(field);
+      setSortDir('asc');
+    }
+  };
 
   const pillCount = (v: StatusFilter) =>
     v === 'all' ? words.length : words.filter((w) => w.status === v).length;
@@ -681,20 +694,28 @@ function Dashboard() {
               <div className="flex items-center gap-4 px-6 py-3 border-b border-[#1C1E35] bg-[#0A0C18]">
                 <div className="flex-1 min-w-0">
                   <button
-                    onClick={() => setSortDir((d) => d === 'asc' ? 'desc' : d === 'desc' ? null : 'asc')}
+                    onClick={() => handleSort('word')}
                     className="flex items-center gap-1 text-[10px] font-semibold uppercase tracking-widest transition-colors text-slate-600 hover:text-slate-400"
                   >
                     Word
-                    {sortDir === 'asc'  ? <ArrowUp   className="w-3 h-3 text-indigo-400" /> :
-                     sortDir === 'desc' ? <ArrowDown className="w-3 h-3 text-indigo-400" /> :
-                                         <ArrowUpDown className="w-3 h-3 opacity-40" />}
+                    {sortField === 'word' && sortDir === 'asc'  ? <ArrowUp   className="w-3 h-3 text-indigo-400" /> :
+                     sortField === 'word' && sortDir === 'desc' ? <ArrowDown className="w-3 h-3 text-indigo-400" /> :
+                                                                  <ArrowUpDown className="w-3 h-3 opacity-40" />}
                   </button>
                 </div>
                 <div className="hidden sm:block flex-1 min-w-0 text-[10px] font-semibold text-slate-600 uppercase tracking-widest">Translation</div>
                 <div className="hidden sm:block w-28    text-[10px] font-semibold text-slate-600 uppercase tracking-widest">Language</div>
-                <div className="hidden lg:block w-24    text-[10px] font-semibold text-slate-600 uppercase tracking-widest">Type</div>
-                <div className="hidden xl:block w-24    text-[10px] font-semibold text-slate-600 uppercase tracking-widest">Present</div>
-                <div className="hidden xl:block w-24    text-[10px] font-semibold text-slate-600 uppercase tracking-widest">Past</div>
+                <div className="hidden lg:block w-24">
+                  <button
+                    onClick={() => handleSort('type')}
+                    className="flex items-center gap-1 text-[10px] font-semibold uppercase tracking-widest transition-colors text-slate-600 hover:text-slate-400"
+                  >
+                    Type
+                    {sortField === 'type' && sortDir === 'asc'  ? <ArrowUp   className="w-3 h-3 text-indigo-400" /> :
+                     sortField === 'type' && sortDir === 'desc' ? <ArrowDown className="w-3 h-3 text-indigo-400" /> :
+                                                                  <ArrowUpDown className="w-3 h-3 opacity-40" />}
+                  </button>
+                </div>
                 <div className="w-28                    text-[10px] font-semibold text-slate-600 uppercase tracking-widest">Status</div>
                 <div className="w-14" />
               </div>
@@ -743,20 +764,6 @@ function Dashboard() {
                         <div className="hidden lg:flex items-center w-24 flex-shrink-0">
                           <span className={`text-xs font-medium capitalize ${POS_COLOR[word.partOfSpeech] ?? 'text-slate-500'}`}>
                             {word.partOfSpeech}
-                          </span>
-                        </div>
-                        <div className="hidden xl:flex items-center w-24 flex-shrink-0">
-                          <span className="text-xs font-mono text-slate-400 truncate">
-                            {word.partOfSpeech === 'verb' && word.presentTense
-                              ? word.presentTense
-                              : <span className="text-slate-700">—</span>}
-                          </span>
-                        </div>
-                        <div className="hidden xl:flex items-center w-24 flex-shrink-0">
-                          <span className="text-xs font-mono text-slate-400 truncate">
-                            {word.partOfSpeech === 'verb' && word.pastTense
-                              ? word.pastTense
-                              : <span className="text-slate-700">—</span>}
                           </span>
                         </div>
                         <div className="w-28 flex-shrink-0">

@@ -211,6 +211,41 @@ export function WordDetailPanel({ word, onClose, onStatusChange, onDelete }: Pro
                   </motion.div>
                 )}
 
+                {/* Simple tense strings (verbs without full conjugation table) */}
+                {word.partOfSpeech === 'verb' && (!word.conjugations || word.conjugations.length === 0) && (word.presentTense || word.pastTense) && (
+                  <motion.section
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.22 }}
+                  >
+                    <h3 className="text-[11px] font-semibold text-slate-500 uppercase tracking-widest mb-2.5">
+                      Conjugations
+                    </h3>
+                    <div className="space-y-2">
+                      {word.presentTense && (
+                        <div className="border border-[#1C1E35] rounded-xl overflow-hidden">
+                          <div className="px-4 py-3 bg-[#111325]">
+                            <span className="text-sm font-medium text-slate-300">Present</span>
+                          </div>
+                          <div className="px-4 py-3 bg-[#0D0F1C]">
+                            <span className="text-sm text-slate-200 font-mono">{word.presentTense}</span>
+                          </div>
+                        </div>
+                      )}
+                      {word.pastTense && (
+                        <div className="border border-[#1C1E35] rounded-xl overflow-hidden">
+                          <div className="px-4 py-3 bg-[#111325]">
+                            <span className="text-sm font-medium text-slate-300">Past</span>
+                          </div>
+                          <div className="px-4 py-3 bg-[#0D0F1C]">
+                            <span className="text-sm text-slate-200 font-mono">{word.pastTense}</span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </motion.section>
+                )}
+
                 {/* Conjugation tables (verbs only) */}
                 {word.partOfSpeech === 'verb' && word.conjugations && word.conjugations.length > 0 && (
                   <motion.section
