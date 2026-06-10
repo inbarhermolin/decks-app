@@ -70,7 +70,14 @@ function Session() {
         fetchSettings(user.id),
         fetchDecks(user.id).catch(() => [] as Deck[]),
       ]);
-      setAllWords(cloudWords.length > 0 ? cloudWords : VOCAB_DATA);
+      // Merge seed conjugations back in for any seed word that lacks them in DB
+      const seedMap = new Map(VOCAB_DATA.map((w) => [w.id, w]));
+      const merged = cloudWords.map((w) => {
+        const seed = seedMap.get(w.id);
+        if (!seed || w.conjugations?.length) return w;
+        return { ...w, conjugations: seed.conjugations };
+      });
+      setAllWords(merged.length > 0 ? merged : VOCAB_DATA);
       setSettings(cloudSettings);
       setDecks(cloudDecks);
     })();

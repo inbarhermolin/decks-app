@@ -22,8 +22,8 @@ interface ModeConfig {
 }
 
 const MODES: ModeConfig[] = [
-  { id: 'sentence-translation', label: 'Sentence Translation', desc: 'Translate full sentences — free typing or word bank', Icon: AlignLeft, available: true },
   { id: 'word-translation',     label: 'Word Translation',     desc: 'Translate individual words — free typing or multiple choice', Icon: Type,       available: true },
+  { id: 'sentence-translation', label: 'Sentence Translation', desc: 'Translate full sentences — free typing or word bank', Icon: AlignLeft, available: true },
   { id: 'verb-conjugation',     label: 'Verb Conjugation',     desc: 'Fill in every conjugation form from memory', Icon: ListOrdered, available: true },
   { id: 'listening',            label: 'Listening',            desc: 'Hear the word and spell it back — or reconstruct a sentence', Icon: Headphones, available: true },
   { id: 'ai-question',          label: 'AI Conversation',      desc: 'Free-form contextual questions powered by AI',                    Icon: Sparkles,   available: false },

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Trophy, RefreshCw, TrendingUp, Check, X, Minus } from 'lucide-react';
 import { Word, Language, WordStatus } from '@/lib/types';
@@ -70,16 +70,22 @@ export function SummaryScreen({
   const approve = (id: string) => setDecisions((d) => ({ ...d, [id]: true }));
   const reject  = (id: string) => setDecisions((d) => ({ ...d, [id]: false }));
 
-  const handleDone = () => {
+  const handleDone = useCallback(() => {
     const approvedIds = new Set(
       Object.entries(decisions)
         .filter(([, v]) => v === true)
         .map(([id]) => id),
     );
     onDone(approvedIds);
-  };
+  }, [decisions, onDone]);
 
   const pendingCount = Object.values(decisions).filter((v) => v === null).length;
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Enter') handleDone(); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [handleDone]);
 
   return (
     <div className="min-h-screen bg-[#07080F] flex flex-col">
