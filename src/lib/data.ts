@@ -55,6 +55,8 @@ export const VOCAB_DATA: Word[] = [
         ],
       },
     ],
+    presentTense: 'hablo, hablas, habla, hablamos, habláis, hablan',
+    pastTense:    'hablé, hablaste, habló, hablamos, hablasteis, hablaron',
     addedAt: '2024-01-10',
   },
   {
@@ -135,6 +137,8 @@ export const VOCAB_DATA: Word[] = [
         ],
       },
     ],
+    presentTense: 'corro, corres, corre, corremos, corréis, corren',
+    pastTense:    'corrí, corriste, corrió, corrimos, corristeis, corrieron',
     addedAt: '2024-01-18',
   },
 
@@ -183,6 +187,8 @@ export const VOCAB_DATA: Word[] = [
         ],
       },
     ],
+    presentTense: 'parlo, parli, parla, parliamo, parlate, parlano',
+    pastTense:    'ho parlato, hai parlato, ha parlato, abbiamo parlato, avete parlato, hanno parlato',
     addedAt: '2024-02-01',
   },
   {
@@ -229,6 +235,8 @@ export const VOCAB_DATA: Word[] = [
         ],
       },
     ],
+    presentTense: 'mangio, mangi, mangia, mangiamo, mangiate, mangiano',
+    pastTense:    'ho mangiato, hai mangiato, ha mangiato, abbiamo mangiato, avete mangiato, hanno mangiato',
     addedAt: '2024-02-03',
   },
   {

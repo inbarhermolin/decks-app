@@ -7,9 +7,9 @@ import {
   Search, BookOpen, ChevronRight, Plus, Gamepad2,
   Zap, Settings2, CheckCircle2, LogOut, Layers,
   Upload, Download, AlertCircle, Pencil,
-  ArrowUp, ArrowDown, ArrowUpDown,
+  ArrowUp, ArrowDown, ArrowUpDown, Sparkles,
 } from 'lucide-react';
-import { Word, WordStatus, Language, Deck } from '@/lib/types';
+import { Word, WordStatus, Language, Deck, PartOfSpeech } from '@/lib/types';
 import { VOCAB_DATA } from '@/lib/data';
 import { AppSettings, DEFAULT_SETTINGS } from '@/lib/settings';
 import {
@@ -107,6 +107,7 @@ function Dashboard() {
 
   const [toast, setToast]         = useState<{ msg: string; type: ToastType } | null>(null);
   const [userStats, setUserStats] = useState<UserStats>(DEFAULT_STATS);
+  const [filling, setFilling]     = useState(false);
 
   // ── Load from cloud on mount ───────────────────────────────────────────────
   useEffect(() => {
@@ -250,6 +251,59 @@ function Dashboard() {
       setDeckFilter('all');
     }
   }, [deckFilter]);
+
+  const handleFillVerbs = useCallback(async () => {
+    if (!user || filling) return;
+
+    const toFill = words.filter(
+      (w) => w.partOfSpeech === 'verb' && (!w.presentTense || !w.pastTense),
+    );
+    if (toFill.length === 0) {
+      showToast('All verbs already have conjugation data');
+      return;
+    }
+
+    setFilling(true);
+    showToast(`Filling conjugations for ${toFill.length} verb${toFill.length !== 1 ? 's' : ''}…`);
+
+    try {
+      const res = await fetch('/api/fill-verbs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          words: toFill.map((w) => ({ id: w.id, word: w.word, language: w.language })),
+        }),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+      const { results } = await res.json() as {
+        results: Array<{ id: string; partOfSpeech: PartOfSpeech; presentTense?: string; pastTense?: string }>;
+      };
+
+      const updateMap = new Map(results.map((r) => [r.id, r]));
+      const updatedWords = words.map((w) => {
+        const u = updateMap.get(w.id);
+        if (!u) return w;
+        return {
+          ...w,
+          partOfSpeech: u.partOfSpeech,
+          presentTense: u.presentTense ?? w.presentTense,
+          pastTense:    u.pastTense    ?? w.pastTense,
+        };
+      });
+
+      setWords(updatedWords);
+      await upsertWords(updatedWords, user.id);
+
+      const filled = results.filter((r) => r.presentTense || r.pastTense).length;
+      showToast(`Done — ${filled} verb${filled !== 1 ? 's' : ''} conjugated`);
+    } catch (err) {
+      console.error('[fill-verbs]', err);
+      showToast('Failed to fill verb conjugations', 'error');
+    } finally {
+      setFilling(false);
+    }
+  }, [user, words, filling, showToast]);
 
   // ── Derived ───────────────────────────────────────────────────────────────
 
@@ -492,6 +546,22 @@ function Dashboard() {
               </button>
 
               <div className="ml-auto flex items-center gap-2">
+                {(() => {
+                  const verbsNeedingFill = words.filter(
+                    (w) => w.partOfSpeech === 'verb' && (!w.presentTense || !w.pastTense),
+                  ).length;
+                  return verbsNeedingFill > 0 ? (
+                    <button
+                      onClick={handleFillVerbs}
+                      disabled={filling}
+                      className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium text-violet-400 border border-violet-500/30 hover:border-violet-500/50 hover:bg-violet-500/5 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                      title={`${verbsNeedingFill} verb${verbsNeedingFill !== 1 ? 's' : ''} missing conjugation data`}
+                    >
+                      <Sparkles className={`w-3.5 h-3.5 ${filling ? 'animate-pulse' : ''}`} />
+                      {filling ? 'Filling…' : `Fill ${verbsNeedingFill} Verb${verbsNeedingFill !== 1 ? 's' : ''}`}
+                    </button>
+                  ) : null;
+                })()}
                 <button
                   onClick={() => setImportModalOpen(true)}
                   className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium text-slate-400 border border-[#1C1E35] hover:border-[#2A2C45] hover:text-slate-300 transition-all"
