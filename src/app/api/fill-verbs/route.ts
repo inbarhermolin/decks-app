@@ -42,23 +42,30 @@ export async function POST(request: Request) {
   let text: string;
   try {
     const response = await client.messages.create({
-      model: 'claude-opus-4-8',
+      model: 'claude-sonnet-4-6',
       max_tokens: 8192,
       messages: [{ role: 'user', content: prompt }],
     });
     const block = response.content[0];
     text = block.type === 'text' ? block.text : '';
   } catch (err) {
+    console.error('[fill-verbs] Claude API error:', err);
     return Response.json({ error: err instanceof Error ? err.message : 'Claude API error' }, { status: 502 });
   }
 
-  const clean = text.trim().replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '').trim();
+  // Extract the JSON array from the response, tolerating markdown fences or surrounding prose
+  const arrayMatch = text.match(/\[[\s\S]*\]/);
+  if (!arrayMatch) {
+    console.error('[fill-verbs] No JSON array found in response. Raw text:', text.slice(0, 500));
+    return Response.json({ error: 'AI response contained no JSON array', raw: text.slice(0, 200) }, { status: 500 });
+  }
 
   let results: WordFillResult[];
   try {
-    results = JSON.parse(clean) as WordFillResult[];
-  } catch {
-    return Response.json({ error: 'Failed to parse AI response' }, { status: 500 });
+    results = JSON.parse(arrayMatch[0]) as WordFillResult[];
+  } catch (parseErr) {
+    console.error('[fill-verbs] JSON parse failed:', parseErr, 'Raw match:', arrayMatch[0].slice(0, 300));
+    return Response.json({ error: 'Failed to parse AI response as JSON' }, { status: 500 });
   }
 
   return Response.json({ results });

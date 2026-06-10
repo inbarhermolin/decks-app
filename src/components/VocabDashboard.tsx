@@ -277,7 +277,10 @@ function Dashboard() {
           words: toFill.map((w) => ({ id: w.id, word: w.word, language: w.language })),
         }),
       });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({})) as { error?: string };
+        throw new Error(body.error ?? `HTTP ${res.status}`);
+      }
 
       const { results } = await res.json() as {
         results: Array<{ id: string; partOfSpeech: PartOfSpeech; presentTense?: string; pastTense?: string }>;
@@ -308,7 +311,7 @@ function Dashboard() {
       showToast(`Done — ${filled} verb${filled !== 1 ? 's' : ''} conjugated`);
     } catch (err) {
       console.error('[fill-verbs]', err);
-      showToast('Failed to fill verb conjugations', 'error');
+      showToast(err instanceof Error ? err.message : 'Failed to fill verb conjugations', 'error');
     } finally {
       setFilling(false);
     }

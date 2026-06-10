@@ -94,7 +94,7 @@ export function WordTranslationGame({ item, allWords, onResult }: Props) {
       <div className="bg-[#0D0F1C] border border-[#1C1E35] rounded-2xl px-6 py-8 text-center overflow-visible">
         <p className="text-[11px] text-slate-600 uppercase tracking-widest mb-3">{shownLang}</p>
         <p className="text-5xl sm:text-6xl font-bold text-white font-mono tracking-tight leading-none">
-          <WordPopover token={shown} allWords={allWords}>{shown}</WordPopover>
+          <WordPopover token={shown} allWords={allWords} wordData={word}>{shown}</WordPopover>
         </p>
         <p className="text-xs text-slate-600 mt-3 capitalize">{word.partOfSpeech}</p>
       </div>

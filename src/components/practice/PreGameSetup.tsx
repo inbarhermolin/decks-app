@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, BookOpen, Zap, ChevronRight } from 'lucide-react';
 import { Word, WordStatus, Deck } from '@/lib/types';
-import { AppSettings } from '@/lib/settings';
+import { AppSettings, LearningDirection } from '@/lib/settings';
 
 const DOT: Record<WordStatus, string> = {
   unknown:      'bg-red-400',
@@ -14,18 +14,25 @@ const DOT: Record<WordStatus, string> = {
 
 const BATCH_OPTIONS = [5, 10, 15, 20, 25];
 
+const DIRECTION_OPTIONS: { value: LearningDirection; label: string }[] = [
+  { value: 'target-to-english', label: '🇮🇹 → 🇬🇧' },
+  { value: 'mixed',             label: 'Mixed' },
+  { value: 'english-to-target', label: '🇬🇧 → 🇮🇹' },
+];
+
 interface Props {
   words:          Word[];
   decks:          Deck[];
   settings:       AppSettings;
   selectedDeckId: string | null;
   onDeckChange:   (id: string | null) => void;
-  onStart:        (batchSize: number) => void;
+  onStart:        (batchSize: number, direction: LearningDirection) => void;
   onBack:         () => void;
 }
 
 export function PreGameSetup({ words, decks, settings, selectedDeckId, onDeckChange, onStart, onBack }: Props) {
-  const [batchSize, setBatchSize] = useState(settings.batchSize);
+  const [batchSize,  setBatchSize]  = useState(settings.batchSize);
+  const [direction,  setDirection]  = useState<LearningDirection>(settings.direction);
 
   const pool = words.filter(
     (w) => w.language === 'Italian' && (!selectedDeckId || w.deckId === selectedDeckId),
@@ -166,14 +173,39 @@ export function PreGameSetup({ words, decks, settings, selectedDeckId, onDeckCha
             </div>
           </motion.div>
 
+          {/* Direction toggle */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.18 }}
+            className="bg-[#0D0F1C] border border-[#1C1E35] rounded-2xl p-5"
+          >
+            <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-widest mb-3">Direction</p>
+            <div className="flex gap-2">
+              {DIRECTION_OPTIONS.map(({ value, label }) => (
+                <button
+                  key={value}
+                  onClick={() => setDirection(value)}
+                  className={`flex-1 py-2 rounded-xl text-xs font-semibold transition-all ${
+                    direction === value
+                      ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20'
+                      : 'bg-[#111325] text-slate-500 border border-[#1C1E35] hover:border-[#2A2C45] hover:text-slate-400'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </motion.div>
+
           {/* Start button */}
           <motion.button
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
+            transition={{ delay: 0.22 }}
             whileHover={{ scale: 1.015 }}
             whileTap={{ scale: 0.99 }}
-            onClick={() => onStart(batchSize)}
+            onClick={() => onStart(batchSize, direction)}
             disabled={total === 0}
             className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:opacity-30 disabled:cursor-not-allowed text-white font-semibold py-4 rounded-2xl flex items-center justify-center gap-2 transition-colors shadow-lg shadow-indigo-500/20"
           >

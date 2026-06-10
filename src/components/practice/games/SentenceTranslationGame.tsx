@@ -77,7 +77,7 @@ export function SentenceTranslationGame({ item, allWords, onResult }: Props) {
       </div>
 
       {/* Source sentence card */}
-      <div className="bg-[#0D0F1C] border border-[#1C1E35] rounded-2xl px-6 py-5 text-center">
+      <div className="bg-[#0D0F1C] border border-[#1C1E35] rounded-2xl px-6 py-5 text-center overflow-visible">
         <p className="text-sm text-slate-600 uppercase tracking-widest mb-3">{shownLang}</p>
         <p className="text-xl sm:text-2xl font-semibold text-white leading-relaxed font-mono">
           &ldquo;<ClickableSentence sentence={shown ?? ''} allWords={allWords} />&rdquo;

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Word, Language, Deck } from '@/lib/types';
 import { VOCAB_DATA } from '@/lib/data';
-import { AppSettings, DEFAULT_SETTINGS } from '@/lib/settings';
+import { AppSettings, DEFAULT_SETTINGS, LearningDirection } from '@/lib/settings';
 import {
   GameModeId,
   QueueItem,
@@ -49,7 +49,8 @@ function Session() {
   const { user } = useAuth();
 
   const [phase, setPhase]               = useState<Phase>('pregame');
-  const [sessionBatchSize, setSessionBatchSize] = useState<number | null>(null);
+  const [sessionBatchSize, setSessionBatchSize]     = useState<number | null>(null);
+  const [sessionDirection,  setSessionDirection]     = useState<LearningDirection | null>(null);
   const [gameMode, setGameMode]         = useState<GameModeId | null>(null);
   const [queue, setQueue]               = useState<QueueItem[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -123,16 +124,19 @@ function Session() {
     setSelectedDeckId(deckId);
   }, []);
 
-  const handlePreGameStart = useCallback((batchSize: number) => {
+  const handlePreGameStart = useCallback((batchSize: number, direction: LearningDirection) => {
     setSessionBatchSize(batchSize);
+    setSessionDirection(direction);
     setPhase('select-mode');
   }, []);
 
   const handleModeSelect = useCallback(
     (mode: GameModeId) => {
-      const sessionSettings = sessionBatchSize !== null
-        ? { ...settings, batchSize: sessionBatchSize }
-        : settings;
+      const sessionSettings: AppSettings = {
+        ...settings,
+        ...(sessionBatchSize !== null ? { batchSize: sessionBatchSize } : {}),
+        ...(sessionDirection  !== null ? { direction: sessionDirection  } : {}),
+      };
       const session = buildSession(practiceWords, LANGUAGE, sessionSettings, mode);
       if (session.length === 0) return;
 
@@ -153,7 +157,7 @@ function Session() {
       setCurrentIndex(0);
       setPhase('playing');
     },
-    [practiceWords, settings, sessionBatchSize],
+    [practiceWords, settings, sessionBatchSize, sessionDirection],
   );
 
   const handleResult = useCallback(
@@ -209,6 +213,7 @@ function Session() {
     setEligibleUpgrades([]);
     setSessionXP(0);
     setSessionBatchSize(null);
+    setSessionDirection(null);
     // Keep selectedDeckId — user likely wants to stay in the same deck
   }, []);
 
