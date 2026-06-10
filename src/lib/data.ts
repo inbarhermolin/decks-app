@@ -20,6 +20,13 @@ export const VOCAB_DATA: Word[] = [
     status: 'unknown',
     exampleSentence: 'Necesito hablar contigo sobre algo muy importante.',
     exampleSentenceTranslation: 'I need to talk to you about something very important.',
+    exampleSentences: [
+      { sentence: 'Yo hablo español todos los días con mis vecinos.', translation: 'I speak Spanish every day with my neighbors.', subject: 'yo' },
+      { sentence: 'Tú hablas muy bien el inglés, ¿dónde lo aprendiste?', translation: 'You speak English very well, where did you learn it?', subject: 'tú' },
+      { sentence: 'Ella habla tres idiomas con total fluidez.', translation: 'She speaks three languages with total fluency.', subject: 'él/ella' },
+      { sentence: 'Nosotros hablamos durante horas sobre el proyecto.', translation: 'We talked for hours about the project.', subject: 'nosotros' },
+      { sentence: 'Ellos hablan en voz baja para no molestar a nadie.', translation: 'They speak quietly so as not to disturb anyone.', subject: 'ellos/ellas' },
+    ],
     conjugations: [
       {
         tense: 'Presente (Present)',
@@ -68,6 +75,13 @@ export const VOCAB_DATA: Word[] = [
     status: 'known',
     exampleSentence: 'El paisaje de las montañas es absolutamente hermoso.',
     exampleSentenceTranslation: 'The mountain landscape is absolutely beautiful.',
+    exampleSentences: [
+      { sentence: 'El atardecer en la playa fue el momento más hermoso del viaje.', translation: 'The sunset on the beach was the most beautiful moment of the trip.' },
+      { sentence: '¡Qué hermosa canción, me trae tantos recuerdos!', translation: 'What a beautiful song, it brings back so many memories!' },
+      { sentence: 'El jardín de mi abuela está lleno de flores hermosas.', translation: "My grandmother's garden is full of beautiful flowers." },
+      { sentence: 'Los niños tienen una amistad hermosa que dura desde la infancia.', translation: 'The children have a beautiful friendship that has lasted since childhood.' },
+      { sentence: 'Este cuadro es el más hermoso del museo, según los críticos.', translation: 'This painting is the most beautiful in the museum, according to critics.' },
+    ],
     addedAt: '2024-01-12',
   },
   {
@@ -79,6 +93,13 @@ export const VOCAB_DATA: Word[] = [
     status: 'half-known',
     exampleSentence: 'Siempre llego tarde a las reuniones del lunes.',
     exampleSentenceTranslation: 'I always arrive late to Monday meetings.',
+    exampleSentences: [
+      { sentence: 'Siempre desayuno café y tostadas antes de ir al trabajo.', translation: 'I always have coffee and toast for breakfast before going to work.' },
+      { sentence: 'Mi madre siempre dice que debo estudiar más.', translation: 'My mother always says I should study more.' },
+      { sentence: 'Él siempre llega el primero a las reuniones.', translation: 'He always arrives first at meetings.' },
+      { sentence: 'Siempre hemos vivido en este barrio, toda nuestra vida.', translation: 'We have always lived in this neighborhood, our whole lives.' },
+      { sentence: '¿Siempre te pones tan nervioso antes de los exámenes?', translation: 'Do you always get so nervous before exams?' },
+    ],
     addedAt: '2024-01-14',
   },
   {
@@ -91,6 +112,13 @@ export const VOCAB_DATA: Word[] = [
     exampleSentence: 'Llegamos a casa de madrugada después de la fiesta.',
     exampleSentenceTranslation: 'We got home in the early hours of the morning after the party.',
     notes: 'Refers specifically to the hours between midnight and sunrise — not the same as "mañana".',
+    exampleSentences: [
+      { sentence: 'Nos despertamos de madrugada para ver el amanecer en la montaña.', translation: 'We woke up in the early hours to see the sunrise in the mountains.' },
+      { sentence: 'El bebé llora a menudo a las tres de la madrugada.', translation: 'The baby often cries at three in the morning.' },
+      { sentence: 'Los panaderos trabajan de madrugada para tener el pan listo al amanecer.', translation: 'Bakers work in the early hours to have the bread ready at dawn.' },
+      { sentence: 'Llegaron a la ciudad en plena madrugada, cuando todo estaba en silencio.', translation: 'They arrived in the city in the dead of night, when everything was silent.' },
+      { sentence: 'La madrugada es mi momento favorito para estudiar, hay mucha paz.', translation: 'The early morning is my favorite time to study, there is a lot of peace.' },
+    ],
     addedAt: '2024-01-16',
   },
   {
@@ -102,6 +130,13 @@ export const VOCAB_DATA: Word[] = [
     status: 'half-known',
     exampleSentence: 'Voy a correr en el parque cada mañana antes del trabajo.',
     exampleSentenceTranslation: 'I am going to run in the park every morning before work.',
+    exampleSentences: [
+      { sentence: 'Yo corro diez kilómetros cada mañana en el parque.', translation: 'I run ten kilometers every morning in the park.', subject: 'yo' },
+      { sentence: 'Tú corres muy rápido, ¿hace cuánto tiempo entrenas?', translation: 'You run very fast, how long have you been training?', subject: 'tú' },
+      { sentence: 'Él corre maratones y siempre termina entre los primeros.', translation: 'He runs marathons and always finishes among the top runners.', subject: 'él/ella' },
+      { sentence: 'Nosotros corremos juntos los fines de semana por el río.', translation: 'We run together on weekends along the river.', subject: 'nosotros' },
+      { sentence: 'Ellos corren para no perder el autobús del colegio.', translation: 'They run so as not to miss the school bus.', subject: 'ellos/ellas' },
+    ],
     conjugations: [
       {
         tense: 'Presente (Present)',
@@ -152,6 +187,13 @@ export const VOCAB_DATA: Word[] = [
     status: 'unknown',
     exampleSentence: 'Devo parlare con il mio capo domani mattina.',
     exampleSentenceTranslation: 'I have to talk to my boss tomorrow morning.',
+    exampleSentences: [
+      { sentence: 'Io parlo italiano da tre anni e mi piace molto.', translation: 'I have been speaking Italian for three years and I really enjoy it.', subject: 'io' },
+      { sentence: 'Tu parli troppo velocemente, non riesco a capirti.', translation: 'You speak too fast, I cannot understand you.', subject: 'tu' },
+      { sentence: 'Lei parla sempre con gentilezza con tutti.', translation: 'She always speaks kindly to everyone.', subject: 'lui/lei' },
+      { sentence: 'Noi parliamo ogni sera al telefono per aggiornarci.', translation: 'We speak on the phone every evening to catch up.', subject: 'noi' },
+      { sentence: 'Loro parlano di politica ad ogni cena di famiglia.', translation: 'They talk about politics at every family dinner.', subject: 'loro' },
+    ],
     conjugations: [
       {
         tense: 'Presente (Present)',
@@ -200,6 +242,13 @@ export const VOCAB_DATA: Word[] = [
     status: 'half-known',
     exampleSentence: 'Stasera vogliamo mangiare la pizza nel centro storico.',
     exampleSentenceTranslation: 'Tonight we want to eat pizza in the old town centre.',
+    exampleSentences: [
+      { sentence: 'Io mangio sempre la frutta a colazione.', translation: 'I always eat fruit for breakfast.', subject: 'io' },
+      { sentence: 'Tu mangi troppo in fretta, dovresti rallentare.', translation: 'You eat too quickly, you should slow down.', subject: 'tu' },
+      { sentence: 'Lui mangia la pasta ogni giorno, è la sua passione.', translation: 'He eats pasta every day, it is his passion.', subject: 'lui/lei' },
+      { sentence: 'Noi mangiamo insieme ogni domenica dalla nonna.', translation: "We eat together every Sunday at grandma's.", subject: 'noi' },
+      { sentence: 'Loro mangiano sempre al ristorante la sera del venerdì.', translation: 'They always eat at a restaurant on Friday evening.', subject: 'loro' },
+    ],
     conjugations: [
       {
         tense: 'Presente (Present)',
@@ -249,6 +298,13 @@ export const VOCAB_DATA: Word[] = [
     exampleSentence: 'Roma è una città bellissima con molti monumenti storici.',
     exampleSentenceTranslation: 'Rome is a beautiful city with many historical monuments.',
     notes: 'Agrees with gender/number: bello / bella / belli / belle.',
+    exampleSentences: [
+      { sentence: 'Che bel giorno, il cielo è completamente azzurro!', translation: 'What a beautiful day, the sky is completely blue!' },
+      { sentence: 'Il tuo appartamento è davvero bello, l\'hai arredato con gusto.', translation: 'Your apartment is really beautiful, you have decorated it tastefully.' },
+      { sentence: 'Firenze è una delle città più belle d\'Italia.', translation: 'Florence is one of the most beautiful cities in Italy.' },
+      { sentence: 'Ha scritto un bel discorso per il matrimonio di sua sorella.', translation: 'He wrote a beautiful speech for his sister\'s wedding.' },
+      { sentence: 'Che bella sorpresa vederti qui, non mi aspettavo di trovarti!', translation: 'What a beautiful surprise to see you here, I did not expect to find you!' },
+    ],
     addedAt: '2024-02-05',
   },
   {
@@ -260,6 +316,13 @@ export const VOCAB_DATA: Word[] = [
     status: 'unknown',
     exampleSentence: 'Purtroppo non posso venire alla tua festa di compleanno.',
     exampleSentenceTranslation: 'Unfortunately I cannot come to your birthday party.',
+    exampleSentences: [
+      { sentence: 'Purtroppo il treno è in ritardo di un\'ora a causa del maltempo.', translation: 'Unfortunately the train is an hour late due to bad weather.' },
+      { sentence: 'Ho cercato il libro ovunque, ma purtroppo era esaurito.', translation: 'I looked for the book everywhere, but unfortunately it was sold out.' },
+      { sentence: 'Purtroppo non ho potuto assistere alla cerimonia per motivi di salute.', translation: 'Unfortunately I was unable to attend the ceremony for health reasons.' },
+      { sentence: 'Il film era molto atteso, ma purtroppo ci ha deluso tutti.', translation: 'The film was highly anticipated, but unfortunately it disappointed us all.' },
+      { sentence: 'Purtroppo le cose non vanno sempre come vorremmo.', translation: 'Unfortunately things do not always go the way we would like.' },
+    ],
     addedAt: '2024-02-07',
   },
   {
@@ -271,6 +334,13 @@ export const VOCAB_DATA: Word[] = [
     status: 'half-known',
     exampleSentence: 'Il tramonto sul mare a Positano è uno spettacolo indimenticabile.',
     exampleSentenceTranslation: 'The sunset over the sea in Positano is an unforgettable spectacle.',
+    exampleSentences: [
+      { sentence: 'Il tramonto dipinge il cielo di arancione e rosa ogni sera.', translation: 'The sunset paints the sky orange and pink every evening.' },
+      { sentence: 'Ci siamo fermati sul lungomare ad ammirare il tramonto insieme.', translation: 'We stopped on the seafront to admire the sunset together.' },
+      { sentence: 'Nessun tramonto è uguale all\'altro, ognuno ha la sua magia.', translation: 'No two sunsets are alike, each one has its own magic.' },
+      { sentence: 'I nonni guardano sempre il tramonto dalla veranda di casa.', translation: 'The grandparents always watch the sunset from the house veranda.' },
+      { sentence: 'Ho scattato una foto meravigliosa al tramonto sulle Dolomiti.', translation: 'I took a wonderful photo of the sunset over the Dolomites.' },
+    ],
     addedAt: '2024-02-09',
   },
 ];
