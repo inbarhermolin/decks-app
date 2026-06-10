@@ -108,7 +108,9 @@ function Dashboard() {
 
   const [toast, setToast]         = useState<{ msg: string; type: ToastType } | null>(null);
   const [userStats, setUserStats] = useState<UserStats>(DEFAULT_STATS);
-  const [filling, setFilling]     = useState(false);
+  const [filling, setFilling]                   = useState(false);
+  const [fillingSentences, setFillingSentences] = useState(false);
+  const [sentencesProgress, setSentencesProgress] = useState<{ done: number; total: number } | null>(null);
 
   // ── Load from cloud on mount ───────────────────────────────────────────────
   useEffect(() => {
@@ -311,6 +313,72 @@ function Dashboard() {
       setFilling(false);
     }
   }, [user, words, filling, showToast]);
+
+  const handleFillSentences = useCallback(async () => {
+    if (!user || fillingSentences) return;
+
+    const toFill = words.filter(
+      (w) => !w.exampleSentences || w.exampleSentences.length < 5,
+    );
+    if (toFill.length === 0) {
+      showToast('All words already have 5 example sentences');
+      return;
+    }
+
+    setFillingSentences(true);
+    setSentencesProgress({ done: 0, total: toFill.length });
+
+    const BATCH = 10;
+    const allChanged: Word[] = [];
+
+    try {
+      for (let i = 0; i < toFill.length; i += BATCH) {
+        const batch = toFill.slice(i, i + BATCH);
+        const res = await fetch('/api/fill-sentences', {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            words: batch.map((w) => ({
+              id:           w.id,
+              word:         w.word,
+              language:     w.language,
+              partOfSpeech: w.partOfSpeech,
+              translation:  w.translation,
+            })),
+          }),
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+        const { results } = await res.json() as {
+          results: Array<{ id: string; sentences: Array<{ sentence: string; translation: string; subject?: string }> }>;
+        };
+
+        const updateMap = new Map(results.map((r) => [r.id, r]));
+        const changed = batch
+          .map((w): Word | null => {
+            const u = updateMap.get(w.id);
+            if (!u || u.sentences.length === 0) return null;
+            return { ...w, exampleSentences: u.sentences };
+          })
+          .filter((w): w is Word => w !== null);
+
+        allChanged.push(...changed);
+        setSentencesProgress({ done: Math.min(i + BATCH, toFill.length), total: toFill.length });
+      }
+
+      const changeMap = new Map(allChanged.map((w) => [w.id, w]));
+      setWords((prev) => prev.map((w) => changeMap.get(w.id) ?? w));
+      if (allChanged.length > 0) await upsertWords(allChanged, user.id);
+
+      showToast(`Done — ${allChanged.length} word${allChanged.length !== 1 ? 's' : ''} filled with 5 sentences`);
+    } catch (err) {
+      console.error('[fill-sentences]', err);
+      showToast('Failed to generate example sentences', 'error');
+    } finally {
+      setFillingSentences(false);
+      setSentencesProgress(null);
+    }
+  }, [user, words, fillingSentences, showToast]);
 
   // ── Derived ───────────────────────────────────────────────────────────────
 
@@ -565,6 +633,29 @@ function Dashboard() {
               </button>
 
               <div className="ml-auto flex items-center gap-2">
+                {/* Fill sentences button — shown when any word is missing 5 sentences */}
+                {(() => {
+                  const needsSentences = words.filter(
+                    (w) => !w.exampleSentences || w.exampleSentences.length < 5,
+                  ).length;
+                  return needsSentences > 0 ? (
+                    <button
+                      onClick={handleFillSentences}
+                      disabled={fillingSentences || filling}
+                      className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium text-indigo-400 border border-indigo-500/30 hover:border-indigo-500/50 hover:bg-indigo-500/5 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                      title={`${needsSentences} word${needsSentences !== 1 ? 's' : ''} missing 5 example sentences`}
+                    >
+                      <Sparkles className={`w-3.5 h-3.5 ${fillingSentences ? 'animate-pulse' : ''}`} />
+                      {fillingSentences
+                        ? sentencesProgress
+                          ? `${sentencesProgress.done}/${sentencesProgress.total} words…`
+                          : 'Starting…'
+                        : `Fill ${needsSentences} Sentence${needsSentences !== 1 ? 's' : ''}`}
+                    </button>
+                  ) : null;
+                })()}
+
+                {/* Fill verbs button */}
                 {(() => {
                   const verbsNeedingFill = words.filter(
                     (w) => w.partOfSpeech === 'verb' && (!w.presentTense || !w.pastTense),
@@ -572,7 +663,7 @@ function Dashboard() {
                   return verbsNeedingFill > 0 ? (
                     <button
                       onClick={handleFillVerbs}
-                      disabled={filling}
+                      disabled={filling || fillingSentences}
                       className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium text-violet-400 border border-violet-500/30 hover:border-violet-500/50 hover:bg-violet-500/5 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
                       title={`${verbsNeedingFill} verb${verbsNeedingFill !== 1 ? 's' : ''} missing conjugation data`}
                     >

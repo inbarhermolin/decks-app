@@ -22,6 +22,12 @@ export interface ConjugationTense {
   rows: ConjugationRow[];
 }
 
+export interface ExampleSentence {
+  sentence:    string;
+  translation: string;
+  subject?:    string; // grammatical person for verbs, e.g. "io", "tu", "lui/lei"
+}
+
 export interface Deck {
   id: string;
   name: string;
@@ -37,6 +43,7 @@ export interface Word {
   status: WordStatus;
   exampleSentence: string;
   exampleSentenceTranslation?: string;
+  exampleSentences?: ExampleSentence[];
   conjugations?: ConjugationTense[];
   notes?: string;
   presentTense?: string;

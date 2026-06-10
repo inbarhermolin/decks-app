@@ -1,5 +1,5 @@
 import { supabase } from './supabase';
-import { Word, WordStatus, Deck } from './types';
+import { Word, WordStatus, Deck, ExampleSentence } from './types';
 import { AppSettings, DEFAULT_SETTINGS } from './settings';
 import { UserStats, DEFAULT_STATS, applySessionToStats } from './gamification';
 
@@ -16,6 +16,7 @@ function rowToWord(row: any): Word {
     status:                     row.status as WordStatus,
     exampleSentence:            row.example_sentence ?? '',
     exampleSentenceTranslation: row.example_sentence_translation ?? undefined,
+    exampleSentences:           (row.example_sentences as ExampleSentence[] | null) ?? undefined,
     conjugations:               row.conjugations ?? undefined,
     notes:                      row.notes ?? undefined,
     presentTense:               row.present_tense ?? undefined,
@@ -39,6 +40,7 @@ function wordToRow(word: Word, userId: string) {
     status:                      word.status,
     example_sentence:            word.exampleSentence || null,
     example_sentence_translation: word.exampleSentenceTranslation ?? null,
+    example_sentences:           word.exampleSentences ?? null,
     conjugations:                word.conjugations ?? null,
     notes:                       word.notes ?? null,
     added_at:                    word.addedAt,
