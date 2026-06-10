@@ -16,7 +16,7 @@ interface Props {
 }
 
 function norm(s: string): string {
-  return normalizeAnswer(s).replace(/\s+/g, ' ');
+  return normalizeAnswer(s);
 }
 
 type Playing = 'word' | 'sentence' | null;

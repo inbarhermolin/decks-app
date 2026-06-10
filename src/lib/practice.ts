@@ -4,8 +4,13 @@ import { AppSettings, LearningDirection } from './settings';
 // ── Normalisation (diacritic-insensitive comparison) ─────────────────────────
 
 export function normalizeAnswer(s: string): string {
-  // NFD decomposes é→e+combining-accent; \p{M} strips all combining marks
-  return s.trim().toLowerCase().normalize('NFD').replace(/\p{M}/gu, '');
+  return s
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/\p{M}/gu, '')      // strip diacritics (é→e)
+    .replace(/[''`´ʼ]/g, '')     // strip apostrophes/elision marks (l'ora→lora)
+    .replace(/\s+/g, ' ');       // collapse whitespace
 }
 
 // ── Types ─────────────────────────────────────────────────────────────────────

@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Send, Check, X } from 'lucide-react';
-import { QueueItem } from '@/lib/practice';
+import { QueueItem, normalizeAnswer } from '@/lib/practice';
 
 interface Props {
   item: QueueItem;
@@ -12,11 +12,10 @@ interface Props {
 
 /** Accept any slash-separated alternative (e.g. "to speak / to talk") */
 function checkAnswer(input: string, target: string): boolean {
-  const normalise = (s: string) => s.trim().toLowerCase();
-  const in_ = normalise(input);
+  const in_ = normalizeAnswer(input);
   return target
     .split('/')
-    .map(normalise)
+    .map(normalizeAnswer)
     .some((t) => t === in_);
 }
 

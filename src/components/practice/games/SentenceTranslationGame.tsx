@@ -11,7 +11,7 @@ interface Props {
 }
 
 function normalize(s: string): string {
-  return normalizeAnswer(s).replace(/\s+/g, ' ');
+  return normalizeAnswer(s);
 }
 
 export function SentenceTranslationGame({ item, onResult }: Props) {
