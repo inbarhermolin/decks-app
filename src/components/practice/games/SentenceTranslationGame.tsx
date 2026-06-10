@@ -1,12 +1,16 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Send, Check, X, RotateCcw } from 'lucide-react';
+import { Word } from '@/lib/types';
 import { QueueItem, shuffle, normalizeAnswer } from '@/lib/practice';
+import { useEnterToContinue } from './useEnterToContinue';
+import { ClickableSentence } from './ClickableSentence';
 
 interface Props {
-  item: QueueItem;
+  item:     QueueItem;
+  allWords: Word[];
   onResult: (passed: boolean) => void;
 }
 
@@ -14,7 +18,7 @@ function normalize(s: string): string {
   return normalizeAnswer(s);
 }
 
-export function SentenceTranslationGame({ item, onResult }: Props) {
+export function SentenceTranslationGame({ item, allWords, onResult }: Props) {
   const { word, direction } = item;
 
   const shown  = direction === 'target-to-english'
@@ -57,6 +61,9 @@ export function SentenceTranslationGame({ item, onResult }: Props) {
     setPicked([]); setWbChecked(false); setWbCorrect(false);
   };
 
+  const continueWb = useCallback(() => onResult(wbCorrect), [onResult, wbCorrect]);
+  useEnterToContinue(mode === 'word-bank' && wbChecked, continueWb);
+
   return (
     <div className="space-y-4">
 
@@ -73,7 +80,7 @@ export function SentenceTranslationGame({ item, onResult }: Props) {
       <div className="bg-[#0D0F1C] border border-[#1C1E35] rounded-2xl px-6 py-5 text-center">
         <p className="text-sm text-slate-600 uppercase tracking-widest mb-3">{shownLang}</p>
         <p className="text-xl sm:text-2xl font-semibold text-white leading-relaxed font-mono">
-          &ldquo;{shown}&rdquo;
+          &ldquo;<ClickableSentence sentence={shown ?? ''} allWords={allWords} />&rdquo;
         </p>
         <p className="text-xs text-slate-700 mt-3">
           Key: <span className="text-indigo-400 font-mono">{word.word}</span>{' '}

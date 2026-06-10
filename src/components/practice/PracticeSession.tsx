@@ -27,7 +27,7 @@ import {
 import { computeSessionXP } from '@/lib/gamification';
 import { useAuth } from '@/lib/auth';
 import { AuthGuard }               from '../AuthGuard';
-import { LanguageSelect }          from './LanguageSelect';
+import { PreGameSetup }            from './PreGameSetup';
 import { GameModeSelect }          from './GameModeSelect';
 import { GameHeader }              from './GameHeader';
 import { FlashcardGame }           from './games/FlashcardGame';
@@ -40,14 +40,16 @@ import { SummaryScreen }           from './SummaryScreen';
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
-type Phase = 'select-language' | 'select-mode' | 'playing' | 'summary';
+type Phase = 'pregame' | 'select-mode' | 'playing' | 'summary';
+
+const LANGUAGE = 'Italian' as const;
 
 function Session() {
   const router = useRouter();
   const { user } = useAuth();
 
-  const [phase, setPhase]               = useState<Phase>('select-language');
-  const [language, setLanguage]         = useState<Language | null>(null);
+  const [phase, setPhase]               = useState<Phase>('pregame');
+  const [sessionBatchSize, setSessionBatchSize] = useState<number | null>(null);
   const [gameMode, setGameMode]         = useState<GameModeId | null>(null);
   const [queue, setQueue]               = useState<QueueItem[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -83,14 +85,11 @@ function Session() {
     })();
   }, [user]);
 
-  const languages = useMemo(
-    () => [...new Set(allWords.map((w) => w.language))] as Language[],
-    [allWords],
-  );
-
-  // Words filtered by selected deck — used for session building
+  // Words filtered to Italian + selected deck — used for session building
   const practiceWords = useMemo(
-    () => selectedDeckId ? allWords.filter((w) => w.deckId === selectedDeckId) : allWords,
+    () => allWords.filter(
+      (w) => w.language === LANGUAGE && (!selectedDeckId || w.deckId === selectedDeckId),
+    ),
     [allWords, selectedDeckId],
   );
 
@@ -124,14 +123,17 @@ function Session() {
     setSelectedDeckId(deckId);
   }, []);
 
-  const handleLanguageSelect = useCallback((lang: Language) => {
-    setLanguage(lang);
+  const handlePreGameStart = useCallback((batchSize: number) => {
+    setSessionBatchSize(batchSize);
     setPhase('select-mode');
   }, []);
 
   const handleModeSelect = useCallback(
     (mode: GameModeId) => {
-      const session = buildSession(practiceWords, language!, settings, mode);
+      const sessionSettings = sessionBatchSize !== null
+        ? { ...settings, batchSize: sessionBatchSize }
+        : settings;
+      const session = buildSession(practiceWords, LANGUAGE, sessionSettings, mode);
       if (session.length === 0) return;
 
       const initResults = new Map<string, WordResult>();
@@ -151,7 +153,7 @@ function Session() {
       setCurrentIndex(0);
       setPhase('playing');
     },
-    [practiceWords, language, settings],
+    [practiceWords, settings, sessionBatchSize],
   );
 
   const handleResult = useCallback(
@@ -198,8 +200,7 @@ function Session() {
   );
 
   const handlePracticeAgain = useCallback(() => {
-    setPhase('select-language');
-    setLanguage(null);
+    setPhase('pregame');
     setGameMode(null);
     setQueue([]);
     setCurrentIndex(0);
@@ -207,6 +208,7 @@ function Session() {
     setOriginalCount(0);
     setEligibleUpgrades([]);
     setSessionXP(0);
+    setSessionBatchSize(null);
     // Keep selectedDeckId — user likely wants to stay in the same deck
   }, []);
 
@@ -227,15 +229,15 @@ function Session() {
     <div className="min-h-screen bg-[#07080F]">
       <AnimatePresence mode="wait">
 
-        {phase === 'select-language' && (
-          <motion.div key="select-lang" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.25 }}>
-            <LanguageSelect
+        {phase === 'pregame' && (
+          <motion.div key="pregame" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.25 }}>
+            <PreGameSetup
               words={allWords}
-              languages={languages}
               decks={decks}
+              settings={settings}
               selectedDeckId={selectedDeckId}
               onDeckChange={handleDeckChange}
-              onSelect={handleLanguageSelect}
+              onStart={handlePreGameStart}
               onBack={() => router.push('/')}
             />
           </motion.div>
@@ -244,10 +246,10 @@ function Session() {
         {phase === 'select-mode' && (
           <motion.div key="select-mode" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.25 }}>
             <GameModeSelect
-              language={language!}
+              language={LANGUAGE}
               allWords={practiceWords}
               onSelect={handleModeSelect}
-              onBack={() => setPhase('select-language')}
+              onBack={() => setPhase('pregame')}
             />
           </motion.div>
         )}
@@ -255,7 +257,7 @@ function Session() {
         {phase === 'playing' && currentItem && (
           <motion.div key="playing" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="flex flex-col min-h-screen">
             <GameHeader
-              language={language!}
+              language={LANGUAGE}
               cleared={clearedCount}
               total={originalCount}
               isRetry={currentItem.attemptNumber > 1}
@@ -275,7 +277,7 @@ function Session() {
                     <FlashcardGame item={currentItem} onResult={handleResult} />
                   )}
                   {currentItem.gameMode === 'sentence-translation' && (
-                    <SentenceTranslationGame item={currentItem} onResult={handleResult} />
+                    <SentenceTranslationGame item={currentItem} allWords={allWords} onResult={handleResult} />
                   )}
                   {currentItem.gameMode === 'word-translation' && (
                     <WordTranslationGame item={currentItem} allWords={allWords} onResult={handleResult} />
@@ -300,7 +302,7 @@ function Session() {
             <SummaryScreen
               results={[...results.values()]}
               eligibleUpgrades={eligibleUpgrades}
-              language={language!}
+              language={LANGUAGE}
               sessionXP={sessionXP}
               onDone={handleSummaryDone}
               onPracticeAgain={handlePracticeAgain}

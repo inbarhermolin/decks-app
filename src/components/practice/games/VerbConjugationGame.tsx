@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
+import { useEnterToContinue } from './useEnterToContinue';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Send, Check, X, Lock, RotateCcw } from 'lucide-react';
 import { ConjugationTense } from '@/lib/types';
@@ -115,6 +116,20 @@ export function VerbConjugationGame({ item, onResult }: Props) {
     setAllCorrect(allNowOk);
     setPhase('retry-checked');
   };
+
+  const continueChecked = useCallback(() => {
+    if (allCorrect) onResult(true);
+  }, [allCorrect, onResult]);
+
+  const continueRetryChecked = useCallback(() => {
+    const missed = wrongPronouns.length > 0 && tense
+      ? { pronouns: wrongPronouns, tense: tense.tense }
+      : undefined;
+    onResult(allCorrect, missed);
+  }, [allCorrect, wrongPronouns, tense, onResult]);
+
+  useEnterToContinue(phase === 'checked' && allCorrect, continueChecked);
+  useEnterToContinue(phase === 'retry-checked', continueRetryChecked);
 
   if (!tense || visibleRows.length === 0) {
     return (

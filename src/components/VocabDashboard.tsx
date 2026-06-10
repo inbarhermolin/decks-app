@@ -281,20 +281,26 @@ function Dashboard() {
         results: Array<{ id: string; partOfSpeech: PartOfSpeech; presentTense?: string; pastTense?: string }>;
       };
 
+      // Build only the words that actually changed (keyed on the current `toFill` snapshot)
       const updateMap = new Map(results.map((r) => [r.id, r]));
-      const updatedWords = words.map((w) => {
-        const u = updateMap.get(w.id);
-        if (!u) return w;
-        return {
-          ...w,
-          partOfSpeech: u.partOfSpeech,
-          presentTense: u.presentTense ?? w.presentTense,
-          pastTense:    u.pastTense    ?? w.pastTense,
-        };
-      });
+      const changedWords: Word[] = toFill
+        .map((w): Word | null => {
+          const u = updateMap.get(w.id);
+          if (!u) return null;
+          return {
+            ...w,
+            partOfSpeech: u.partOfSpeech,
+            presentTense: u.presentTense ?? w.presentTense,
+            pastTense:    u.pastTense    ?? w.pastTense,
+          };
+        })
+        .filter((w): w is Word => w !== null);
 
-      setWords(updatedWords);
-      await upsertWords(updatedWords, user.id);
+      // Merge into state using a functional update (avoids stale-closure overwrite)
+      const changeMap = new Map(changedWords.map((w) => [w.id, w]));
+      setWords((prev) => prev.map((w) => changeMap.get(w.id) ?? w));
+
+      if (changedWords.length > 0) await upsertWords(changedWords, user.id);
 
       const filled = results.filter((r) => r.presentTense || r.pastTense).length;
       showToast(`Done — ${filled} verb${filled !== 1 ? 's' : ''} conjugated`);

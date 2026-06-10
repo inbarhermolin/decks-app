@@ -1,10 +1,12 @@
 'use client';
 
-import { useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Send, Check, X } from 'lucide-react';
 import { Word } from '@/lib/types';
 import { QueueItem, shuffle, normalizeAnswer } from '@/lib/practice';
+import { useEnterToContinue } from './useEnterToContinue';
+import { WordPopover } from './WordPopover';
 
 interface Props {
   item: QueueItem;
@@ -71,6 +73,11 @@ export function WordTranslationGame({ item, allWords, onResult }: Props) {
     setSelected(null);
   };
 
+  const continueTyping = useCallback(() => onResult(correct), [onResult, correct]);
+  const continueMC     = useCallback(() => onResult(mcCorrect), [onResult, mcCorrect]);
+  useEnterToContinue(mode === 'typing' && submitted, continueTyping);
+  useEnterToContinue(mode === 'multiple-choice' && selected !== null, continueMC);
+
   return (
     <div className="space-y-4">
 
@@ -84,10 +91,10 @@ export function WordTranslationGame({ item, allWords, onResult }: Props) {
       </div>
 
       {/* Source word card — LARGE typography */}
-      <div className="bg-[#0D0F1C] border border-[#1C1E35] rounded-2xl px-6 py-8 text-center">
+      <div className="bg-[#0D0F1C] border border-[#1C1E35] rounded-2xl px-6 py-8 text-center overflow-visible">
         <p className="text-[11px] text-slate-600 uppercase tracking-widest mb-3">{shownLang}</p>
         <p className="text-5xl sm:text-6xl font-bold text-white font-mono tracking-tight leading-none">
-          {shown}
+          <WordPopover token={shown} allWords={allWords}>{shown}</WordPopover>
         </p>
         <p className="text-xs text-slate-600 mt-3 capitalize">{word.partOfSpeech}</p>
       </div>

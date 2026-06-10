@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
+import { useEnterToContinue } from './useEnterToContinue';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Volume2, Send, Check, X, RotateCcw } from 'lucide-react';
 import { QueueItem, shuffle, normalizeAnswer } from '@/lib/practice';
@@ -92,6 +93,11 @@ export function ListeningGame({ item, onResult }: Props) {
     setPicked([]); setWbChecked(false); setWbCorrect(false);
     setMode(m);
   };
+
+  const continueTyping = useCallback(() => onResult(correct), [onResult, correct]);
+  const continueWb     = useCallback(() => onResult(wbCorrect), [onResult, wbCorrect]);
+  useEnterToContinue(mode === 'typing' && submitted, continueTyping);
+  useEnterToContinue(mode === 'word-bank' && wbChecked, continueWb);
 
   // ── Handlers ──────────────────────────────────────────────────────────────
   const handleTypingSubmit = () => {
